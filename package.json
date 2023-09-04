@@ -1,6 +1,6 @@
 {
   "name": "from-protobuf-object",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "fromObject method for protobuf",
   "main": "lib/index.js",
   "scripts": {
