@@ -1,0 +1,9 @@
+.idea/
+.vscode/
+coverage/
+node_modules/
+.npm/
+.eslintcache/
+lib/
+
+__tests__/test-data/generated/

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message Spices {
+  string name = 1;
+  MixedSpice mixed = 2;
+}
+
+message MixedSpice {
+  repeated Spices spices = 1;
+}
+

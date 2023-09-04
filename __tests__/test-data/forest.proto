@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+message Forest {
+  repeated Tree trees = 1;
+  Info info = 2;
+}
+
+message Tree {
+  int32 age = 1;
+  int32 height = 2;
+}
+
+message Info {
+  string name = 1;
+  int32 number_of_trees = 2;
+}

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+message Newspaper {
+  int32 id = 1;
+  string name = 2;
+  oneof fist_page {
+    bool is_ads = 3;
+    bool is_news = 4;
+  }
+  map<int32, string> content_by_page = 5;
+  map<int32, Ads> ads_by_page = 6;
+}
+
+message Ads {
+  string data = 1;
+}

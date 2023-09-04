@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+message Universe {
+  repeated string planets = 1;
+}

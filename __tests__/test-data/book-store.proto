@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message BookStore {
+  string name = 1;
+  int32 shelf = 2;
+}

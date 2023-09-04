@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+message PhoneShop {
+  int32 id = 1;
+  Phone phone = 2;
+}
+
+message Phone {
+  string model = 1;
+  int32 diagonal = 2;
+  int32 price = 3;
+  Company company = 4;
+}
+
+message Company {
+  string name = 1;
+  string country = 2;
+}
