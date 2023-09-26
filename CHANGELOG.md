@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/infodusha/from-protobuf-object/compare/v1.0.1...v1.0.2) (2023-09-26)
+
+
+### Bug Fixes
+
+* support for binary data ([bceae90](https://github.com/infodusha/from-protobuf-object/commit/bceae90a4080a326d9ba9c5e6e9f1265d9266317))
+
 ## [1.0.1](https://github.com/infodusha/from-protobuf-object/compare/v1.0.0...v1.0.1) (2023-09-04)
 
 
