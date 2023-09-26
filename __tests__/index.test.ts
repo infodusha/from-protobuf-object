@@ -5,6 +5,7 @@ import { Forest } from "./test-data/generated/forest_pb";
 import { Universe } from "./test-data/generated/universe_pb";
 import { Spices } from "./test-data/generated/spices_pb";
 import { Newspaper } from "./test-data/generated/newspaper_pb";
+import { File } from "./test-data/generated/file_pb";
 
 describe('fromProtobufObject', () => {
     it('Should work with easy structure', () => {
@@ -246,3 +247,27 @@ describe('Map rule', () => {
         expect(newspaper.toObject()).toEqual(obj);
     });
 });
+
+describe('Binary data', () => {
+    it('Should work with Uint8Array', () => {
+        const obj = {
+            name: 'index.pdf',
+            data: new Uint8Array([1, 3, 4]),
+        } satisfies File.AsObject;
+        const expected = new File();
+        expected.setName(obj.name);
+        expected.setData(obj.data);
+        const file = fromProtobufObject(File, obj);
+        expect(file).toEqual(expected);
+    });
+
+
+    it('Should work with string', () => {
+        const obj = {
+            name: 'index.pdf',
+            data: 'teeeeestttt',
+        } satisfies File.AsObject;
+        const file = fromProtobufObject(File, obj);
+        expect(file.toObject()).toEqual(obj);
+    });
+})

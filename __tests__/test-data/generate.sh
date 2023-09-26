@@ -17,3 +17,4 @@ gen ./forest.proto
 gen ./universe.proto
 gen ./spices.proto
 gen ./newspaper.proto
+gen ./file.proto

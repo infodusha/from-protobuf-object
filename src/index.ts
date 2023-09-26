@@ -39,6 +39,9 @@ export function fromProtobufObject<T extends Message>(MessageType: MessageConstr
 }
 
 function getResult<T extends Message>(instance: T, prop: string, value: unknown): unknown {
+    if (value instanceof Uint8Array) {
+        return value;
+    }
     if (Array.isArray(value)) {
         if (value.length === 0 || !isArrayOfObjects(value, prop)) {
             return value;
@@ -130,7 +133,7 @@ function validateType<T extends Message>(instance: T, prop: string, value: unkno
     const getter = getMethod(prop, PREFIX.GET);
     const instanceValue = callMethod(instance, getter);
     const expectedType = instanceValue !== undefined ? typeof instanceValue : 'object';
-    const actualType = typeof value;
+    const actualType = value instanceof Uint8Array ? 'string' : typeof value;
     if (Array.isArray(instanceValue) && !Array.isArray(value)) {
         throw new Error(`Invalid type for '${prop}' (expected array, got '${actualType}')`);
     }
