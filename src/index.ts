@@ -13,7 +13,8 @@ const enum PREFIX {
 export function fromProtobufObject<T extends Message>(MessageType: MessageConstructor<T>, data: AsObject<T>): T {
     const instance = new MessageType();
     validateMissingProps(instance, data);
-    for (const [prop, value] of Object.entries(filterExtraProps(instance, data))) {
+    for (const [key, value] of Object.entries(filterExtraProps(instance, data))) {
+        const prop = getActualKey(key);
         if (Array.isArray(value) && isProtobufMap(instance, prop)) {
             const mapMethod = getMethod(prop, PREFIX.GET);
             const map = callMethod(instance, mapMethod) as ProtobufMap<unknown, unknown>;
@@ -66,8 +67,12 @@ function callMethod<T extends object, R>(obj: T, key: string, value?: unknown): 
     return (obj[key as keyof T] as (value: unknown) => R)(value);
 }
 
+function getActualKey(key: string): string {
+    return key === 'pb_default' ? 'default' : key;
+}
+
 function getProp(key: string, prefix: PREFIX): string {
-    const prop = key.slice(prefix.length);
+    const prop = getActualKey(key).slice(prefix.length);
     return prop.slice(0, 1).toLowerCase() + prop.slice(1);
 }
 
@@ -99,9 +104,9 @@ function isOptional<T extends Message>(instance: T, prop: string): boolean {
 
 function validateMissingProps<T extends Message>(instance: T, data: AsObject<T>): void {
     const instanceProps = getInstanceProps(instance);
-    const dataProps = Object.keys(data);
+    const dataKeys = Object.keys(data).map(getActualKey);
     for (const prop of instanceProps) {
-        if (!dataProps.includes(prop) && !isOptional(instance, prop)) {
+        if (!dataKeys.includes(prop) && !isOptional(instance, prop)) {
             throw new Error(`Missing property '${prop}'`);
         }
     }
@@ -109,7 +114,7 @@ function validateMissingProps<T extends Message>(instance: T, data: AsObject<T>)
 
 function filterExtraProps<T extends Message>(instance: T, data: AsObject<T>): AsObject<T> {
     const instanceProps = getInstanceProps(instance);
-    return Object.fromEntries(Object.entries(data).filter(([key, value]) => instanceProps.includes(key) && value !== undefined)) as AsObject<T>;
+    return Object.fromEntries(Object.entries(data).filter(([key, value]) => instanceProps.includes(getActualKey(key)) && value !== undefined)) as AsObject<T>;
 }
 
 function isObject(value: unknown, prop: string): boolean {

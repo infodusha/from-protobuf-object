@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+message Edge {
+  bool default = 1;
+}

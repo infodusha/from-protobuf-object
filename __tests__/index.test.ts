@@ -6,6 +6,7 @@ import { Universe } from "./test-data/generated/universe_pb";
 import { Spices } from "./test-data/generated/spices_pb";
 import { Newspaper } from "./test-data/generated/newspaper_pb";
 import { File } from "./test-data/generated/file_pb";
+import { Edge } from "./test-data/generated/edge_pb";
 
 describe('fromProtobufObject', () => {
     it('Should work with easy structure', () => {
@@ -270,4 +271,14 @@ describe('Binary data', () => {
         const file = fromProtobufObject(File, obj);
         expect(file.toObject()).toEqual(obj);
     });
-})
+});
+
+describe("Edge cases", () => {
+  it("Should work with  default property", () => {
+    const obj = {
+      pb_default: true,
+    } satisfies Edge.AsObject;
+    const file = fromProtobufObject(Edge, obj);
+    expect(file.toObject()).toEqual(obj);
+  });
+});
