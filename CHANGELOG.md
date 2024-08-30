@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/infodusha/from-protobuf-object/compare/v1.0.2...v1.0.3) (2024-08-30)
+
+
+### Bug Fixes
+
+* default key edge case ([b54304b](https://github.com/infodusha/from-protobuf-object/commit/b54304b2f5e86df12f1c34c3d7f7ba5846299428))
+
 ## [1.0.2](https://github.com/infodusha/from-protobuf-object/compare/v1.0.1...v1.0.2) (2023-09-26)
 
 
