@@ -15,18 +15,18 @@ jobs:
         id: release
         with:
           release-type: node
-          pull-request-title-pattern: 'chore: release ${version}'
+          pull-request-title-pattern: "chore: release ${version}"
       - uses: actions/checkout@v3
         if: ${{ steps.release.outputs.release_created }}
       - uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "22.x"
+          registry-url: "https://registry.npmjs.org"
         if: ${{ steps.release.outputs.release_created }}
       - name: Install Protobuf
         uses: arduino/setup-protoc@v1
         with:
-          version: '3.x'
+          version: "3.x"
         if: ${{ steps.release.outputs.release_created }}
       - run: npm install -g npm
         if: ${{ steps.release.outputs.release_created }}
