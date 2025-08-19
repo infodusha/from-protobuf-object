@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/infodusha/from-protobuf-object/compare/v1.0.3...v2.0.0) (2025-08-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* update google-protobuf
+
+### Features
+
+* update google-protobuf ([9f6964d](https://github.com/infodusha/from-protobuf-object/commit/9f6964d26224ad4f38eddd8a56194f42cf9eb0c3))
+
 ## [1.0.3](https://github.com/infodusha/from-protobuf-object/compare/v1.0.2...v1.0.3) (2024-08-30)
 
 
