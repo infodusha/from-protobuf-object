@@ -47,6 +47,6 @@
     "typescript": "^5.9.2"
   },
   "peerDependencies": {
-    "google-protobuf": "^4.0.0"
+    "google-protobuf": "^3.21.2"
   }
 }
