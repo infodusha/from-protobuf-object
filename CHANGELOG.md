@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/infodusha/from-protobuf-object/compare/v2.0.0...v2.0.1) (2025-08-19)
+
+
+### Bug Fixes
+
+* fix broken release ([e70d7e9](https://github.com/infodusha/from-protobuf-object/commit/e70d7e9b09918b634cdcdbd701d90485191a7e8e))
+
 ## [2.0.0](https://github.com/infodusha/from-protobuf-object/compare/v1.0.3...v2.0.0) (2025-08-19)
 
 
