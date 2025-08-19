@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/infodusha/from-protobuf-object/compare/v2.0.1...v2.0.2) (2025-08-19)
+
+
+### Bug Fixes
+
+* rollback google-protobuf update ([be86967](https://github.com/infodusha/from-protobuf-object/commit/be8696793d6651bbd577cb981adfa3cefe576361))
+
 ## [2.0.1](https://github.com/infodusha/from-protobuf-object/compare/v2.0.0...v2.0.1) (2025-08-19)
 
 
