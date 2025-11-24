@@ -9,6 +9,9 @@
     "lint": "eslint .",
     "generate": "sh ./__tests__/test-data/generate.sh"
   },
+  "sideEffects": [
+    "node_modules/google-protobuf/**/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/infodusha/from-protobuf-object.git"
