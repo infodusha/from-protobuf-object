@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -10,25 +11,23 @@ jobs:
       contents: write
       pull-requests: write
       id-token: write
+
     steps:
-      - uses: google-github-actions/release-please-action@v3
+      - uses: googleapis/release-please-action@v4
         id: release
         with:
           release-type: node
-          pull-request-title-pattern: "chore: release ${version}"
       - uses: actions/checkout@v3
         if: ${{ steps.release.outputs.release_created }}
       - uses: actions/setup-node@v3
         with:
-          node-version: "22.x"
+          node-version: "24.x"
           registry-url: "https://registry.npmjs.org"
         if: ${{ steps.release.outputs.release_created }}
       - name: Install Protobuf
         uses: arduino/setup-protoc@v1
         with:
           version: "3.x"
-        if: ${{ steps.release.outputs.release_created }}
-      - run: npm install -g npm
         if: ${{ steps.release.outputs.release_created }}
       - run: npm ci
         if: ${{ steps.release.outputs.release_created }}
@@ -39,6 +38,4 @@ jobs:
       - run: npm run test
         if: ${{ steps.release.outputs.release_created }}
       - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         if: ${{ steps.release.outputs.release_created }}
