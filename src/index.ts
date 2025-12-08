@@ -1,8 +1,14 @@
-import { Message, Map as ProtobufMap } from "google-protobuf";
+import { BinaryReader, Message, Map as ProtobufMap } from "google-protobuf";
 
 type MessageConstructor<T extends Message> = new () => T;
 
 type AsObject<T extends Message> = ReturnType<T["toObject"]>;
+
+type FakeReaderValue = Message | ProtobufMap<unknown, unknown>;
+
+interface FakeReaderRef {
+    current?: FakeReaderValue;
+}
 
 const enum PREFIX {
     SET = 'set',
@@ -18,7 +24,7 @@ export function fromProtobufObject<T extends Message>(MessageType: MessageConstr
         if (Array.isArray(value) && isProtobufMap(instance, prop)) {
             const mapMethod = getMethod(prop, PREFIX.GET);
             const map = callMethod(instance, mapMethod) as ProtobufMap<unknown, unknown>;
-            const NestedType = retrieveNestedMapTypePatch(instance, prop);
+            const NestedType = retrieveNestedMapType(instance, prop);
             for (const [k, v] of value) {
                 if(!isObject(v, prop)) {
                     map.set(k, v);
@@ -47,17 +53,11 @@ function getResult<T extends Message>(instance: T, prop: string, value: unknown)
         if (value.length === 0 || !isArrayOfObjects(value, prop)) {
             return value;
         }
-        const NestedType = retrieveNestedRepeatedTypePatch(instance, prop);
-        if (!NestedType) {
-            throw new Error('Unable to retrieve nested type');
-        }
+        const NestedType = retrieveNestedType(instance, prop);
         return value.map((child) => fromProtobufObject(NestedType, child));
     }
     if (isObject(value, prop)) {
-        const NestedType = retrieveNestedTypePatch(instance, prop);
-        if (!NestedType) {
-            throw new Error('Unable to retrieve nested type');
-        }
+        const NestedType = retrieveNestedType(instance, prop);
         return fromProtobufObject(NestedType, value as object);
     }
     return value;
@@ -150,38 +150,91 @@ function validateType<T extends Message>(instance: T, prop: string, value: unkno
     }
 }
 
-function retrieveNestedTypePatch<T extends Message, N extends Message>(instance: T, prop: string): MessageConstructor<N> | null {
-    const getWrapperField = Message.getWrapperField;
-    let nestedType: MessageConstructor<Message> | null = null;
-    Message.getWrapperField = function(msg, ctor, fieldNumber, required) {
-        nestedType = ctor;
-        return getWrapperField(msg, ctor, fieldNumber, required);
+function getFieldNumber<T extends Message>(instance: T, prop: string): number {
+    const Ctor = instance.constructor as MessageConstructor<T>;
+    const i = new Ctor();
+    
+    let fieldNumber = -1;
+    const trackNumericKey = (key: PropertyKey) => {
+        if (fieldNumber === -1 && typeof key === 'string') {
+            const num = Number(key);
+            if (!isNaN(num)) fieldNumber = num;
+        }
     };
-    callMethod(instance, getMethod(prop, PREFIX.GET));
-    Message.getWrapperField = getWrapperField;
-    return nestedType;
+    
+    const handler: ProxyHandler<object> = {
+        get(target, key) {
+            trackNumericKey(key);
+            const record = target as Record<PropertyKey, unknown>;
+            let value = record[key];
+            if (value === undefined && typeof key === 'string') {
+                record[key] = {};
+                value = record[key];
+            }
+            return typeof value === 'object' && value !== null 
+                ? new Proxy(value, handler) 
+                : value;
+        },
+        has(target, key) {
+            trackNumericKey(key);
+            return key in target;
+        },
+    };
+    
+    const proxy = new Proxy(i, handler) as T;
+    callMethod(proxy, getMethod(prop, PREFIX.GET));
+    return fieldNumber;
 }
 
-function retrieveNestedRepeatedTypePatch<T extends Message, N extends Message>(instance: T, prop: string): MessageConstructor<N> | null {
-    const getRepeatedWrapperField = Message.getRepeatedWrapperField;
-    let nestedType: MessageConstructor<Message> | null = null;
-    Message.getRepeatedWrapperField = function(msg, ctor, fieldNumber) {
-        nestedType = ctor;
-        return getRepeatedWrapperField(msg, ctor, fieldNumber);
-    };
-    callMethod(instance, getMethod(prop, PREFIX.GET));
-    Message.getRepeatedWrapperField = getRepeatedWrapperField;
-    return nestedType;
+function makeFakeReader(fieldNumber: number) {
+  const ref: FakeReaderRef = {};
+  const reader = {
+    nextField() {
+        return !ref.current;
+    },
+    isEndGroup() {
+        return false;
+    },
+    getFieldNumber() {
+        return fieldNumber;
+    },
+    readMessage(msg: FakeReaderValue) {
+        ref.current = msg;
+    },
+    skipField() {},
+  } satisfies Partial<BinaryReader> as unknown as BinaryReader;
+
+  return [reader, ref] as const;
 }
 
-function retrieveNestedMapTypePatch<T extends Message, N extends Message>(instance: T, prop: string): MessageConstructor<N> | null {
-    const getMapField = Message.getMapField;
-    let nestedType: typeof Message | null = null;
-    Message.getMapField = function(msg, fieldNumber, noLazyCreate, valueCtor) {
-        nestedType = valueCtor ?? null;
-        return getMapField(msg, fieldNumber, noLazyCreate, valueCtor);
-    };
-    callMethod(instance, getMethod(prop, PREFIX.GET));
-    Message.getMapField = getMapField;
-    return nestedType;
+function retrieveNestedType<T extends Message, N extends Message>(instance: T, prop: string): MessageConstructor<N> {
+    const fieldNumber = getFieldNumber(instance, prop);
+    const [reader, ref] = makeFakeReader(fieldNumber);
+    const Ctor = instance.constructor as typeof Message;
+    Ctor.deserializeBinaryFromReader(instance, reader);
+    if (!ref.current) {
+        throw new Error('Unable to retrieve nested type');
+    }
+    return ref.current.constructor as MessageConstructor<N>;
+}
+
+function retrieveNestedMapType<T extends Message, N extends Message>(instance: T, prop: string): MessageConstructor<N> | null {
+    const fieldNumber = getFieldNumber(instance, prop);
+    const [reader, ref] = makeFakeReader(fieldNumber);
+    const Ctor = instance.constructor as typeof Message;
+    Ctor.deserializeBinaryFromReader(instance, reader);
+    if (!ref.current) {
+        throw new Error('Unable to retrieve nested map type');
+    }
+    const mapInstance = ref.current as ProtobufMap<unknown, unknown>;
+
+    const mapObj = mapInstance as unknown as Record<string, unknown>;
+    for (const key of Object.keys(mapObj)) {
+        const value = mapObj[key];
+        if (typeof value === 'function' && value.prototype instanceof Message) {
+            return value as MessageConstructor<N>;
+        }
+    }
+    
+    return null;
 }
