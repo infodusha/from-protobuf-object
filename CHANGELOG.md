@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.0.0](https://github.com/infodusha/from-protobuf-object/compare/v2.0.2...v3.0.0) (2025-12-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* non-patch nested type retrieval
+
+### Features
+
+* non-patch nested type retrieval ([31ec0d8](https://github.com/infodusha/from-protobuf-object/commit/31ec0d8128810f12e183d4ac3727803ef191e6ae))
+
+
+### Bug Fixes
+
+* support turbopack ([37e8ab2](https://github.com/infodusha/from-protobuf-object/commit/37e8ab2cfe77062aa155c91c82181acf81a3d73d))
+
 ## [2.0.2](https://github.com/infodusha/from-protobuf-object/compare/v2.0.1...v2.0.2) (2025-08-19)
 
 
