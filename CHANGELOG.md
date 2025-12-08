@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/infodusha/from-protobuf-object/compare/v3.0.0...v3.0.1) (2025-12-08)
+
+
+### Bug Fixes
+
+* deps updates ([c318b72](https://github.com/infodusha/from-protobuf-object/commit/c318b72279bba9cce709d3ea9e16401a6a883946))
+
 ## [3.0.0](https://github.com/infodusha/from-protobuf-object/compare/v2.0.2...v3.0.0) (2025-12-08)
 
 
